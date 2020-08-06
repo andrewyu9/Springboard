@@ -1,0 +1,39 @@
+1. write a SQL statement that calculates the average duration in days for each valid outage type that compares the average durations 
+for Start Time in 2016 and 2017. Order by Reason and Year.
+
+select Status, Reason,
+  count(status) as Total_Number_Outage_Events,
+  round(avg((TIMESTAMPDIFF(MINUTE, Start_Time, End_time)/60)/24),2) as Average_Outage_Duration_Time_Days,
+  Year(Start_Time) as Year  
+from AEMR
+where YEAR(Start_Time) in (2016,2017)
+and Status = 'Approved'
+group by Reason, Status, Year
+order by Reason, Year
+
+2. Write a SQL statement showing the total number of all valid outage types (Forced, Consequential, Scheduled, Opportunistic) that occurred for both 2016 and 
+2017 per month (i.e. 1 – 12). Order the year from 2016 to 2017. Order by Month and Year.
+
+select Status,
+  count(status) as Total_Number_Outage_Events,
+  Month(Start_Time) as Month,
+  Year(Start_Time) as Year 
+from AEMR
+where YEAR(Start_Time) in (2016,2017)
+and Status = 'Approved'
+group by Status, Month, Year
+order by Month, Year
+
+3. Write a SQL statement showing the average duration of all valid (i.e. status = approved) outage types (Forced, Consequential, Scheduled, Opportunistic) for all 
+participant codes from 2016 to 2017. Order the average duration in descending order.
+
+select 
+   Participant_Code,
+   Status,
+   Year(Start_Time) as Year,
+   round(avg((TIMESTAMPDIFF(MINUTE, Start_Time, End_time)/60)/24),2) as Average_Outage_Duration_Time_Days
+from AEMR
+where YEAR(Start_Time) in (2016,2017)
+and Status = 'Approved'
+group by Participant_Code, Status, Year
+order by  Average_Outage_Duration_Time_Days desc
