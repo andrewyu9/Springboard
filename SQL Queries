@@ -1,18 +1,18 @@
-#Calculate each game's goal to the overall_avg
+-- Calculate each game's goal to the overall_avg
 SELECT 
-	m.id, 
+  m.id, 
   c.name AS country, 
   m.season,
-	m.home_goal,
-	m.away_goal,
-	avg(m.home_goal + m.away_goal) over() AS overall_avg
+  m.home_goal,
+  m.away_goal,
+  avg(m.home_goal + m.away_goal) over() AS overall_avg
 FROM match AS m
 LEFT JOIN country AS c ON m.country_id = c.id;
 
 
-#Calculates the rank of average goals scored across all leagues in the database for season 2011/2012
+-- Calculates the rank of average goals scored across all leagues in the database for season 2011/2012
 SELECT 
-	l.name AS league,
+    l.name AS league,
     avg(m.home_goal + m.away_goal) AS avg_goals,
     rank() over(order by AVG(m.home_goal + m.away_goal)) AS league_rank
 FROM league AS l
@@ -22,11 +22,11 @@ WHERE m.season = '2011/2012'
 GROUP BY l.name
 ORDER BY league_rank;
 
-#CTE setup
+-- CTE setup
 with match_list as (
     SELECT 
-  		country_id, 
-  		id
+  	country_id, 
+  	id
     FROM match
     WHERE (home_goal + away_goal) >= 10)
 
@@ -34,6 +34,16 @@ SELECT
     l.name AS league,
     COUNT(match_list.id) AS matches
 FROM league AS l
-##Join the CTE to the league table
+-- Join the CTE to the league table
 LEFT JOIN match_list ON l.id = match_list.country_id
 GROUP BY l.name;
+
+
+-- Calculate MAU by counting the users for every month.
+SELECT
+  -- Truncate the order date to the nearest month
+  date_trunc('month',order_date) :: DATE AS delivr_month,
+  count(distinct user_id) AS mau
+FROM orders
+GROUP BY delivr_month
+ORDER BY delivr_month ASC;
